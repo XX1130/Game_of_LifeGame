@@ -285,8 +285,8 @@ void drawBlockLine(int i,int j)
 
 void mousePressed()
 {
-  int cmX=mouseX/cellSize;
-  int cmY=mouseY/cellSize;
+  int cmX=(mouseX-translateMatrixX)/cellSize;
+  int cmY=(mouseY-translateMatrixY)/cellSize;
   
   if(!gameStart)
   {
