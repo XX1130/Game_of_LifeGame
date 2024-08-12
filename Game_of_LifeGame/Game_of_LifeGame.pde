@@ -5,15 +5,42 @@ int cellSize=8;
 boolean edit1Player=true;
 boolean editPlayer=true;
 
+boolean isShip=false;
+
 boolean gameStart;
 int translateMatrixX=0;
 int translateMatrixY=0;
+
+int startTime;
+int currentTime;
+
+//______________________________sounds_______________________________
+import processing.sound.*;
+SoundFile sound001;
+SoundFile sound002;
+SoundFile sound003;
+SoundFile sound004;
+SoundFile sound005;
+SoundFile sound006;
+SoundFile sound007;
+SoundFile sound008;
 
 void setup()
 {
   size(1600,800);
   background(255);
   
+  //__________________sounds__________________________________________________________
+  sound001 = new SoundFile(this, "/sounds/001_zundamon_voicebox_yuseinanoda.wav");
+  sound002 = new SoundFile(this, "/sounds/002_zundamon_voicebox_resseinanoda.wav");
+  sound003 = new SoundFile(this, "/sounds/003_zundamon_voicebox_kusozakoinoda.wav");
+  sound004 = new SoundFile(this, "/sounds/004_zundamon_voicebox_mazuinoda.wav");
+  sound005 = new SoundFile(this, "/sounds/005_zundamon_voicebox_kusoge-nanoda.wav");
+  sound006 = new SoundFile(this, "/sounds/006_zundamon_voicebox_kutabarenanoda.wav");
+  sound007 = new SoundFile(this, "/sounds/007_zundamon_voicebox_maketanoda.wav");
+  sound008 = new SoundFile(this, "/sounds/008_zundamon_voicebox_startnanoda.wav");
+  //___________________________________________________________________________________
+
   gameStart=false;
   
   for(int i=0; i< cell.length; i++)
@@ -30,6 +57,8 @@ void setup()
 
 void draw()
 {
+  currentTime=millis();
+  
   background(255);
   
   translate(translateMatrixX,translateMatrixY);
@@ -53,6 +82,7 @@ void draw()
   debag();
 }
 
+//_______________________________define judgeLifeCoreProcesse()_________________________________
 void judgeLifeCoreProcesse()
 {
   saveCell();
@@ -72,6 +102,10 @@ void judgeLifeCoreProcesse()
       judgeLifeDrawFase(i,j);
     }
   }
+  
+  stroke(255,100,255);
+  line(cellSize*cell.length/2, 0, cellSize*cell.length/2, cellSize*cell.length);
+  line(0, cellSize*cell.length/2, cellSize*cell.length, cellSize*cell.length/2);
 }
 
 void saveCell()
@@ -278,11 +312,14 @@ void drawBlockLine(int i,int j)
   stroke(255,0,0);
   rect(cellSize*30*i,cellSize*30*j,cellSize*30,cellSize*30);
   
-  stroke(255,100,255);
-  line(cellSize*cell.length/2, 0, cellSize*cell.length/2, cellSize*cell.length);
-  line(0, cellSize*cell.length/2, cellSize*cell.length, cellSize*cell.length/2);
+  //stroke(255,100,255);
+  //line(cellSize*cell.length/2, 0, cellSize*cell.length/2, cellSize*cell.length);
+  //line(0, cellSize*cell.length/2, cellSize*cell.length, cellSize*cell.length/2);
 }
 
+
+
+//______________________________________________________________void mousePressed____________________________
 void mousePressed()
 {
   int cmX=(mouseX-translateMatrixX)/cellSize;
@@ -329,6 +366,7 @@ void mousePressed()
   }
 }
 
+//_____________________________________________________________void keyPressed()____________________________
 void keyPressed()
 {
   //start
@@ -337,6 +375,8 @@ void keyPressed()
     if(gameStart==false)
     {
       gameStart=true;
+      
+      sound008.play();
     }
     else 
     {
