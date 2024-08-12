@@ -1,9 +1,9 @@
 int[][] cell =new int[300][300];
 int[][] savedCell=new int[300][300];
+int cellSize=8;
 
 boolean edit1Player=true;
-
-int cellSize=8;
+boolean editPlayer=true;
 
 boolean gameStart;
 int translateMatrixX=0;
@@ -41,6 +41,11 @@ void draw()
   else
   {
     drawInitialLife();
+  }
+  
+  if(countCellValue()==0)
+  {
+    gameStart=false;
   }
   
   //preDrawBlockLine();
@@ -216,9 +221,13 @@ void judgeLifeDrawFase(int i,int j)
   {
     fill(0,0,255);
   }
-  else
+  else if(cell[i][j]==2)
   {
     fill(0,255,0);
+  }
+  else
+  {
+    fill(128,128,128);
   }
   stroke(0);
   rect(cellSize*i,cellSize*j,cellSize,cellSize);
@@ -237,6 +246,19 @@ void drawInitialLife()
   stroke(255,100,255);
   line(cellSize*cell.length/2, 0, cellSize*cell.length/2, cellSize*cell.length);
   line(0, cellSize*cell.length/2, cellSize*cell.length, cellSize*cell.length/2);
+}
+
+int countCellValue()
+{
+  int samAllCell=0;
+  for(int i=0; i<cell.length; i++)
+  {
+    for(int j=0; j<cell[i].length; j++)
+    {
+      samAllCell=samAllCell+cell[i][j];
+    }
+  }
+  return samAllCell;
 }
 
 void preDrawBlockLine()
@@ -268,26 +290,40 @@ void mousePressed()
   
   if(!gameStart)
   {
-    if(edit1Player)
+    if(editPlayer)
     {
-      if(cell[cmX][cmY]==1)
+      if(edit1Player)
       {
-        cell[cmX][cmY]=0;
+        if(cell[cmX][cmY]==1)
+        {
+          cell[cmX][cmY]=0;
+        }
+        else
+        {
+          cell[cmX][cmY]=1;
+        }
       }
       else
       {
-        cell[cmX][cmY]=1;
+        if(cell[cmX][cmY]==2)
+        {
+          cell[cmX][cmY]=0;
+        }
+        else
+        {
+          cell[cmX][cmY]=2;
+        }
       }
     }
     else
     {
-      if(cell[cmX][cmY]==2)
+      if(cell[cmX][cmY]==3)
       {
         cell[cmX][cmY]=0;
       }
       else
       {
-        cell[cmX][cmY]=2;
+        cell[cmX][cmY]=3;
       }
     }
   }
@@ -321,8 +357,25 @@ void keyPressed()
     }
   }
   
+  if(keyCode==TAB)
+  {
+    if(editPlayer)
+    {
+      editPlayer=false;
+    }
+    else
+    {
+      editPlayer=true;
+    }
+  }
+  
   //movement of viewpoint
-  boolean isEdgeX=true;
+  movementOfViewpoint();
+}
+
+void movementOfViewpoint()
+{
+boolean isEdgeX=true;
   boolean isEdgeY=true;
   if(translateMatrixX>=0 || translateMatrixX<=width-(cell.length*cellSize))
   {
@@ -401,8 +454,6 @@ void keyPressed()
   }
 }
 
-
 void debag()
 {
-  println(translateMatrixX,translateMatrixY);
 }
