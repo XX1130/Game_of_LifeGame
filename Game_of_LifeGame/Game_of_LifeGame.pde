@@ -6,24 +6,25 @@ boolean edit1Player=true;
 boolean editPlayer=true;
 
 boolean isShip=false;
+boolean isHeavyweightSpaceShip=false;
+boolean isLightweightSpaceShip=false;
 
 boolean gameStart;
 int translateMatrixX=0;
 int translateMatrixY=0;
+int cmX;
+int cmY;
 
 int startTime;
 int currentTime;
 
 //______________________________sounds_______________________________
 import processing.sound.*;
-SoundFile sound001;
-SoundFile sound002;
-SoundFile sound003;
-SoundFile sound004;
-SoundFile sound005;
-SoundFile sound006;
-SoundFile sound007;
-SoundFile sound008;
+int soundsLength=8;
+SoundFile[] sound=new SoundFile[soundsLength];
+int[] soundTime = new int[soundsLength];
+boolean[] interval=new boolean[soundsLength];
+//___________________________________________________________________
 
 void setup()
 {
@@ -31,14 +32,19 @@ void setup()
   background(255);
   
   //__________________sounds__________________________________________________________
-  sound001 = new SoundFile(this, "/sounds/001_zundamon_voicebox_yuseinanoda.wav");
-  sound002 = new SoundFile(this, "/sounds/002_zundamon_voicebox_resseinanoda.wav");
-  sound003 = new SoundFile(this, "/sounds/003_zundamon_voicebox_kusozakoinoda.wav");
-  sound004 = new SoundFile(this, "/sounds/004_zundamon_voicebox_mazuinoda.wav");
-  sound005 = new SoundFile(this, "/sounds/005_zundamon_voicebox_kusoge-nanoda.wav");
-  sound006 = new SoundFile(this, "/sounds/006_zundamon_voicebox_kutabarenanoda.wav");
-  sound007 = new SoundFile(this, "/sounds/007_zundamon_voicebox_maketanoda.wav");
-  sound008 = new SoundFile(this, "/sounds/008_zundamon_voicebox_startnanoda.wav");
+  sound[0] = new SoundFile(this, "/sounds/001_zundamon_voicebox_yuseinanoda.wav");
+  sound[1] = new SoundFile(this, "/sounds/002_zundamon_voicebox_resseinanoda.wav");
+  sound[2] = new SoundFile(this, "/sounds/003_zundamon_voicebox_kusozakoinoda.wav");
+  sound[3] = new SoundFile(this, "/sounds/004_zundamon_voicebox_mazuinoda.wav");
+  sound[4] = new SoundFile(this, "/sounds/005_zundamon_voicebox_kusoge-nanoda.wav");
+  sound[5] = new SoundFile(this, "/sounds/006_zundamon_voicebox_kutabarenanoda.wav");
+  sound[6] = new SoundFile(this, "/sounds/007_zundamon_voicebox_maketanoda.wav");
+  sound[7] = new SoundFile(this, "/sounds/008_zundamon_voicebox_startnanoda.wav");
+  
+  for(int i=0; i<soundTime.length;i++)
+  {
+    soundTime[i]=millis();
+  }
   //___________________________________________________________________________________
 
   gameStart=false;
@@ -52,7 +58,7 @@ void setup()
   }
   
   //initialCell
-  
+  initialLife1();
 }
 
 void draw()
@@ -61,16 +67,22 @@ void draw()
   
   background(255);
   
+  pushMatrix();
   translate(translateMatrixX,translateMatrixY);
+  cmX=(mouseX-translateMatrixX)/cellSize;
+  cmY=(mouseY-translateMatrixY)/cellSize;
   
   if(gameStart)
   {
     judgeLifeCoreProcesse();
+    
   }
   else
   {
     drawInitialLife();
   }
+  
+  popMatrix();
   
   if(countCellValue()==0)
   {
@@ -102,6 +114,8 @@ void judgeLifeCoreProcesse()
       judgeLifeDrawFase(i,j);
     }
   }
+  
+  regularSounds();
   
   stroke(255,100,255);
   line(cellSize*cell.length/2, 0, cellSize*cell.length/2, cellSize*cell.length);
@@ -282,17 +296,121 @@ void drawInitialLife()
   line(0, cellSize*cell.length/2, cellSize*cell.length, cellSize*cell.length/2);
 }
 
+//__________________________DATE_____________________________
 int countCellValue()
 {
-  int samAllCell=0;
+  int samAllCell;
+  samAllCell=countCell1()+countCell2();
+  return samAllCell;
+}
+
+int countCell1()
+{
+  int countCell1=0;
   for(int i=0; i<cell.length; i++)
   {
     for(int j=0; j<cell[i].length; j++)
     {
-      samAllCell=samAllCell+cell[i][j];
+      if(cell[i][j]==1)
+      {
+        countCell1++;
+      }
     }
   }
-  return samAllCell;
+  return countCell1;
+}
+
+int countCell2()
+{
+  int countCell2=0;
+  for(int i=0; i<cell.length;i++)
+  {
+    for(int j=0; j<cell[i].length; j++)
+    {
+      if(cell[i][j]==2)
+      {
+        countCell2++;
+      }
+    }
+  }
+  return countCell2;
+}
+//_____________________________________________________
+
+void regularSounds()
+{
+  for(int i=0; i<interval.length;i++)
+  {
+    if(currentTime-soundTime[i]>=10000)
+    {
+      interval[i]=true;
+    }
+  }
+  for(int i=0; i<interval.length; i++)
+  {
+    if(interval[i])
+    {
+      distinguishSound(i);
+    }
+  }
+}
+
+void distinguishSound(int i)
+{
+  if(i==0)
+  {
+    if(countCell1()>countCell2() && (countCell1()/2)<countCell2())
+    {
+      sound[0].play();
+      interval[0]=false;
+      soundTime[0]=millis();
+    }
+  }
+  else if(i==1)
+  {
+    if(countCell2()>countCell1() && (countCell2()/2)<countCell1())
+    {
+      sound[1].play();
+      interval[1]=false;
+      soundTime[1]=millis();
+    }
+  }
+  else if(i==2)
+  {
+    if((countCell1()/2)>countCell2() && (countCell1()/4)<countCell2())
+    {
+      sound[2].play();
+      interval[2]=false;
+      soundTime[2]=millis();
+    }
+  }
+  else if(i==3)
+  {
+    if((countCell2()/2)>countCell1() && (countCell2()/4)<countCell1())
+    {
+      sound[3].play();
+      interval[3]=false;
+      soundTime[3]=millis();
+    }
+  }
+  else if(i==4)
+  {
+    if(countCell2()/4>=countCell1())
+    {
+      sound[4].play();
+      interval[4]=false;
+      soundTime[4]=millis();
+    }
+  }
+  else if(i==5)
+  {
+    if(countCell1()/4>countCell2())
+    {
+      sound[5].play();
+      interval[5]=false;
+      soundTime[5]=millis();
+    }
+  }
 }
 
 void preDrawBlockLine()
@@ -317,56 +435,82 @@ void drawBlockLine(int i,int j)
   //line(0, cellSize*cell.length/2, cellSize*cell.length, cellSize*cell.length/2);
 }
 
-
-
 //______________________________________________________________void mousePressed____________________________
 void mousePressed()
 {
-  int cmX=(mouseX-translateMatrixX)/cellSize;
-  int cmY=(mouseY-translateMatrixY)/cellSize;
   
   if(!gameStart)
   {
-    if(editPlayer)
+    preGameFase();
+  }
+}
+
+void preGameFase()
+{
+  if(editPlayer)
+  {
+    if(edit1Player)
     {
-      if(edit1Player)
-      {
-        if(cell[cmX][cmY]==1)
-        {
-          cell[cmX][cmY]=0;
-        }
-        else
-        {
-          cell[cmX][cmY]=1;
-        }
-      }
-      else
-      {
-        if(cell[cmX][cmY]==2)
-        {
-          cell[cmX][cmY]=0;
-        }
-        else
-        {
-          cell[cmX][cmY]=2;
-        }
-      }
-    }
-    else
-    {
-      if(cell[cmX][cmY]==3)
+      if(cell[cmX][cmY]==1)
       {
         cell[cmX][cmY]=0;
       }
       else
       {
-        cell[cmX][cmY]=3;
+        cell[cmX][cmY]=1;
       }
+      
+      if(isShip)
+      {
+        createGlider(1,cmX,cmY);
+      }
+      else if(isHeavyweightSpaceShip)
+      {
+        createHeavyweightSpaceShip(1,cmX,cmY);
+      }
+      else if(isLightweightSpaceShip)
+      {
+        createLightweightSpaceShip(1,cmX,cmY);
+      }
+    }
+    else
+    {
+      if(cell[cmX][cmY]==2)
+      {
+        cell[cmX][cmY]=0;
+      }
+      else
+      {
+        cell[cmX][cmY]=2;
+      }
+      if(isShip)
+      {
+        createGlider(2,cmX,cmY);
+      }
+      else if(isHeavyweightSpaceShip)
+      {
+        createHeavyweightSpaceShip(2,cmX,cmY);
+      }
+      else if(isLightweightSpaceShip)
+      {
+        createLightweightSpaceShip(2,cmX,cmY);
+      }
+    }
+  }
+  else
+  {
+    if(cell[cmX][cmY]==3)
+    {
+      cell[cmX][cmY]=0;
+    }
+    else
+    {
+      cell[cmX][cmY]=3;
     }
   }
 }
 
-//_____________________________________________________________void keyPressed()____________________________
+//___________________________void keyPressed()____________________________
 void keyPressed()
 {
   //start
@@ -376,7 +520,7 @@ void keyPressed()
     {
       gameStart=true;
       
-      sound008.play();
+      sound[7].play();
     }
     else 
     {
@@ -409,13 +553,48 @@ void keyPressed()
     }
   }
   
+  if(key=='s')
+  {
+    if(isShip)
+    {
+      isShip=false;
+    }
+    else
+    {
+      isShip=true;
+    }
+  }
+  
+  if(key=='h')
+  {
+    if(isHeavyweightSpaceShip)
+    {
+      isHeavyweightSpaceShip=false;
+    }
+    else
+    {
+      isHeavyweightSpaceShip=true;
+    }
+  }
+  
+  if(key=='l')
+  {
+    if(isLightweightSpaceShip)
+    {
+      isLightweightSpaceShip=false;
+    }
+    else
+    {
+      isLightweightSpaceShip=true;
+    }
+  }
   //movement of viewpoint
   movementOfViewpoint();
 }
 
 void movementOfViewpoint()
 {
-boolean isEdgeX=true;
+  boolean isEdgeX=true;
   boolean isEdgeY=true;
   if(translateMatrixX>=0 || translateMatrixX<=width-(cell.length*cellSize))
   {
@@ -496,4 +675,12 @@ boolean isEdgeX=true;
 
 void debag()
 {
+  //if(currentTime-startTime==1000)
+  //{
+  //  for(int i=0; i<interval.length;i++)
+  //  {
+  //    interval[i]=true;
+  //  }
+  //}
+  println(interval[0]);
 }
